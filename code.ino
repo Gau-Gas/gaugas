@@ -14,8 +14,10 @@ char n[20];
  
 int flag=0;
 
+StopWatch MySW1;
 StopWatch MySW;
-StopWatch SWarray[5];
+StopWatch MySW3;
+
 
 float current=0;
 const int currentPin = A0;
@@ -33,27 +35,58 @@ pinMode(13,OUTPUT);
 
 void loop()
 {
- if(current >=0.025)
+ if((current >= 0.033) && (current <= 0.042 ) )
   {
+    
     digitalWrite(13,HIGH);
   flag=1;
-delay(1000);
-//x=message_temp;
-  MySW.start();
- }
-  else
-  {
-    sprintf(message_temp,"JITg@ug@$,1,%d",MySW.elapsed());
+  delay(1000);
+  MySW1.start();
+  Serial.println(MySW1.elapsed());
+  MySW3.stop();
     MySW.stop();
+ }
+ else if((current >= 0.043) && (current <= 0.048 ) )
+ {
+ 
+  digitalWrite(13,LOW);
+  flag=2;
+  delay(1000);
+  MySW.start();
+  Serial.println(MySW.elapsed());
+   MySW1.stop();
+  MySW3.stop();
+ }
+
+else if(current > 0.048)
+ {
+  
+  digitalWrite(13,HIGH);
+  flag=3;
+  delay(1000);
+  MySW3.start();
+  Serial.println(MySW3.elapsed());
+  MySW.stop();
+  MySW1.stop();
+ }
+  //if(current < 0.031)
+  else 
+  {
+    sprintf(message_temp,"J1Tg@ug@$,1,%d,%d,%d,%d,%d",MySW1.elapsed(),MySW.elapsed(),MySW3.elapsed());
+    MySW1.stop();
+    MySW.stop();
+    MySW3.stop();
     digitalWrite(13,LOW);
     
     //Serial.println(message_temp);
-    if(flag==1)
+    if(flag==1 || flag==2 || flag==3)
     {
       Send();
       flag=0;
+     }
+    MySW1.reset();
          MySW.reset();
-    }
+         MySW3.reset();
   }
   
 CurrentSense();
@@ -102,7 +135,7 @@ void Send()
   if(started){
     //Enable this two lines if you want to send an SMS.
     Serial.println(message_temp);
-    sms.SendSMS("9900188301", message_temp);
+   // sms.SendSMS("9900188301", message_temp);
       Serial.println("\nSMS sent OK");
   }
   
